@@ -28,33 +28,43 @@ Empowers the agent to optimize business decisions.
 
 ```mermaid
 graph TD
-    UserReq["👤 User Request:<br/>'Rent The Matrix to John Doe'"] --> Agent[🤖 Autonomous Agent]
-    
-    subgraph "Phase 1: Entity Resolution (Read)"
-        Agent -->|1. Find Customer| TC1[search_customers]
-        TC1 -->|"Found: ID 35"| Agent
-        Agent -->|2. Find Movie| TC2[search_movies]
-        TC2 -->|"Found: ID 92"| Agent
+    UserReq["👤 User Request<br/>'Rent The Matrix to John Doe'"] --> Agent["🤖 Autonomous Agent"]
+
+    subgraph Phase1["Phase 1: Entity Resolution (Read)"]
+        Agent -->|1. Search customer<br/>search_term: Doe| TC1["search_customers"]
+        TC1 -->|"Results include:<br/>customer_id: 35<br/>name: John Doe"| Agent
+
+        Agent -->|2. Search movie<br/>search_term: Matrix| TC2["search_movies"]
+        TC2 -->|"Found:<br/>film_id: 92<br/>title: The Matrix"| Agent
     end
 
-    subgraph "Phase 2: Validation (Read)"
-        Agent -->|3. Check Stock| TC3[get_available_inventory]
-        TC3 -->|"Inv IDs: [402, 403]"| Agent
+    subgraph Phase2["Phase 2: Availability Check (Read)"]
+        Agent -->|3. Get available copies<br/>film_id: 92| TC3["get_available_inventory"]
+        TC3 -->|"Available inventory:<br/>ID 402, store 1<br/>ID 403, store 1"| Agent
     end
 
-    subgraph "Phase 3: Execution (Write)"
-        Agent -->|4. Rent| TC4[rent_movie]
-        TC4 -->|"Success: Rental ID 1092"| Agent
+    subgraph Phase3["Phase 3: Parameter Selection & Execution (Write)"]
+        AgentDecision["Agent selects first available copy<br/>and default staff_id = 1"]
+
+        Agent --> AgentDecision
+        AgentDecision -->|4. Rent movie<br/>customer_id: 35<br/>inventory_id: 402<br/>staff_id: 1| TC4["rent_movie"]
+        TC4 -->|"Success:<br/>Rental ID: 1092"| Agent
     end
 
-    %% Database Connections
-    TC1 -.-> DB[(PostgreSQL)]
+    DB["PostgreSQL<br/>(Sakila Database)"]
+
+    TC1 -.-> DB
     TC2 -.-> DB
     TC3 -.-> DB
     TC4 -->|Commit| DB
-    
+
+    %% Styling
     style Agent fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     style UserReq fill:#fff3e0,stroke:#e65100,stroke-dasharray: 5 5
+    style Phase1 fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style Phase2 fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style Phase3 fill:#ffebee,stroke:#b71c1c,stroke-width:2px
+    style AgentDecision fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
     style DB fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
 ```
 
@@ -110,3 +120,4 @@ Even autonomous agents need guardrails. ADMA implements strict safety measures:
 ---
 
 *Transform your database from a storage engine into an intelligent team member.*
+
