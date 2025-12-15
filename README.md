@@ -28,30 +28,38 @@ Empowers the agent to optimize business decisions.
 
 ```mermaid
 graph TD
-    Goal["User Goal:<br/>'Rent The Matrix to John Doe'"] --> Agent[Autonomous AI Agent]
+    UserReq["👤 User Request:<br/>'Rent The Matrix to John Doe'"] --> Agent[🤖 Autonomous Agent]
     
-    subgraph "The ADMA Loop"
-        Agent -->|1. Search Entity| Search[search_movies / search_customers]
-        Search -->|Results| Agent
-        Agent -->|2. Check Stock| Stock[get_available_inventory]
-        Stock -->|Availability| Agent
-        Agent -->|3. Execute Action| Action[rent_movie]
-        Action -->|Confirmation| Agent
+    subgraph "Phase 1: Entity Resolution (Read)"
+        Agent -->|1. Find Customer| TC1[search_customers]
+        TC1 -->|'John Doe' -> ID 35| Agent
+        Agent -->|2. Find Movie| TC2[search_movies]
+        TC2 -->|'Matrix' -> ID 92| Agent
+    end
+
+    subgraph "Phase 2: Validation (Read)"
+        Agent -->|3. Check Stock| TC3[get_available_inventory]
+        TC3 -->|Inv IDs: [402, 403]| Agent
+    end
+
+    subgraph "Phase 3: Execution (Write)"
+        Agent -->|4. Rent| TC4[rent_movie]
+        TC4 -->|Success: Rental ID 1092| DB[(PostgreSQL)]
     end
     
-    Action --> DB[(PostgreSQL DB)]
-    
-    style Agent fill:#f9f,stroke:#333,stroke-width:2px
-    style Goal fill:#fff,stroke:#333,stroke-dasharray: 5 5
+    style Agent fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style UserReq fill:#fff3e0,stroke:#e65100,stroke-dasharray: 5 5
+    style DB fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
 ```
 
-## �️ Toolset for Autonomy
+## 🛠️ Toolset for Autonomy
 
 The server exposes a suite of **deterministic tools** designed for reliable agent consumption:
 
 | Tool Category | Tool Name | Agentic Purpose |
 | :--- | :--- | :--- |
 | **Discovery** | `search_movies` | Resolving vague user requests to concrete Film IDs. |
+| **Discovery** | `search_customers` | Resolving user names to Customer IDs. |
 | **Context** | `get_customer_history` | Understanding user context before acting. |
 | **Logistics** | `get_available_inventory` | Verifying physical constraints before commitment. |
 | **Action** | `rent_movie` | **State Mutation**: Committing a business transaction. |
