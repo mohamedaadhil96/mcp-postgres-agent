@@ -32,20 +32,26 @@ graph TD
     
     subgraph "Phase 1: Entity Resolution (Read)"
         Agent -->|1. Find Customer| TC1[search_customers]
-        TC1 -->|'John Doe' -> ID 35| Agent
+        TC1 -->|"Found: ID 35"| Agent
         Agent -->|2. Find Movie| TC2[search_movies]
-        TC2 -->|'Matrix' -> ID 92| Agent
+        TC2 -->|"Found: ID 92"| Agent
     end
 
     subgraph "Phase 2: Validation (Read)"
         Agent -->|3. Check Stock| TC3[get_available_inventory]
-        TC3 -->|Inv IDs: [402, 403]| Agent
+        TC3 -->|"Inv IDs: [402, 403]"| Agent
     end
 
     subgraph "Phase 3: Execution (Write)"
         Agent -->|4. Rent| TC4[rent_movie]
-        TC4 -->|Success: Rental ID 1092| DB[(PostgreSQL)]
+        TC4 -->|"Success: Rental ID 1092"| Agent
     end
+
+    %% Database Connections
+    TC1 -.-> DB[(PostgreSQL)]
+    TC2 -.-> DB
+    TC3 -.-> DB
+    TC4 -->|Commit| DB
     
     style Agent fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     style UserReq fill:#fff3e0,stroke:#e65100,stroke-dasharray: 5 5
